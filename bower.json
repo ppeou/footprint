@@ -1,0 +1,21 @@
+{
+  "name": "footprint",
+  "description": "",
+  "main": "footprint.js",
+  "authors": [
+    "Piseth Peou <ppeou@msn.com>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.0.0",
+    "polymer-redux": "^1.0.4"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

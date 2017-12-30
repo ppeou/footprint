@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FootPrint</title>
+  <script src="footprint.js"></script>
+</head>
+<body>
+<script>
+
+  var a = new CarbonValue();
+  a.value = 1;
+  a.value = 2;
+  console.log(a.items, a.value);
+
+
+  var b = new CarbonValue();
+  b.value = {id: 1, name: 'abc'};
+  b.value = {id: 1, name: 'abc-def'};
+  console.log(b.items, b.value);
+
+  var c = new CarbonValue();
+  c.value = {states: {tx: {cities: {1: 'Houston', 2: 'Austin'}}}};
+  c.value = {path: 'states.tx.cities.2', value: 'Austin-123'}
+  c.value = {path: 'states.tx.cities', value: {3: 'Dallas', 4:'San Antonio'}};
+  c.value = {path: 'states.ca.cities', value: {1: 'Los Angeles', 2:'Long Beach'}};
+
+  let tempValue = c.clone.states.tx.cities;
+  Object.assign(tempValue, {1: 'Houston1', 2: 'Austin2'});
+  c.value = {path: 'states.tx.cities', value: tempValue};
+
+  console.log(c.items, c.value.states.tx);
+
+
+
+</script>
+</body>
+</html>

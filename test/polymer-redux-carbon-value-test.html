@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Polymer Redux Carbon Value Test</title>
+</head>
+<body>
+
+<script src="../node_modules/redux/dist/redux.js"></script>
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
+<script>
+
+  const counter = (state = 0, action) => {
+    switch (action.type) {
+      case 'ADD':
+        return (state || 0) + action.value;
+      default:
+        return state
+    }
+  };
+
+
+  const store = Redux.createStore(Redux.combineReducers({counter}));
+
+  window.ReduxMixin = PolymerRedux(store);
+
+  window.actions = {
+    counter: {
+      add: (value) => {
+        store.dispatch({
+          type: 'ADD',
+          value
+        })
+      },
+    }
+  };
+</script>
+<dom-module id="app-demo">
+  <template>
+    <h1>Counter [[counter]]</h1>
+    <button on-click="addCounter" data-count="1">Add</button>
+    <button on-click="addCounter" data-count="-1">Minus</button>
+  </template>
+  <script>
+    class AppDemo extends ReduxMixin(Polymer.Element) {
+      constructor() {
+        super();
+        this.seed = 0;
+        this.serviceId = 0;
+      }
+      static get is() { return 'app-demo'; }
+
+      static get properties() {
+        return {
+          storeChange:{
+            type: Object,
+            statePath: (value) => {console.log('storeChange',value);}
+          },
+          counter: {
+            type: String,
+            statePath: 'counter'
+          },
+        };
+      }
+      static get observers(){
+        return [
+          'onCounterChanged(counter)',
+          'onTodosChanged(todos)',
+          'onStoreChanged(services)',
+        ];
+      }
+      onCounterChanged(counter) {
+        console.log('onCounterChanged', counter);
+      }
+      addCounter(e) {
+        const seed = e.currentTarget.dataset.count;
+        console.log(seed);
+        //storeAction.items.counter.add(Number(seed));
+        window.actions.counter.add(Number(seed));
+      }
+      onStoreChanged(data) {
+        return;
+        console.log('onStoreChanged--',data);
+        if(!this.tempServices) {
+          this.tempServices= Object.assign([], [...data]);
+        } else {
+          this.splice('tempServices', 0, this.tempServices.length, ...data);
+        }
+      }
+    }
+
+    window.customElements.define(AppDemo.is, AppDemo);
+
+
+  </script>
+</dom-module>
+
+<app-demo></app-demo>
+
+
+</body>
+</html>
