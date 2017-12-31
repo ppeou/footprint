@@ -14,8 +14,9 @@ const clone = (a) => {
 }
 
 class CarbonValue {
-  constructor() {
+  constructor(initialValue) {
     this.items = [];
+    if(initialValue !== undefined) {this.items.push(initialValue);}
   }
 
   set value(v) {
@@ -77,73 +78,3 @@ class CarbonValue {
     return parts.join('.');
   }
 }
-
-
-
-
-/*
-class StoreManager {
-  constructor(value) {
-    this.path = {};
-    this.data = {};
-    this.model = new FootPrint();
-    this.store = this.createStore();
-  }
-
-  createReducer() {
-    return (state = undefined, action) => {
-      if (action.type === '@@redux/INIT') {return state;}
-      else {
-        const {path, value} = action.value;
-        return this.update({path, value});
-      }
-    };
-  }
-
-  createStore() {
-    return this.store || Redux.createStore(this.createReducer());
-  }
-
-  update({path, value}) {
-    if (path) {
-      if (!this.path[path]) {
-        this.path[path] = new CarbonValue();
-      }
-      const prop = this.path[path];
-      prop.value = value;
-      this.model.setPath(path, prop.value);
-      return this.model.value;
-    }
-    return undefined;
-  }
-
-  get(path, isClone) {
-    if (path) {
-      const prop = this.path[path];
-      if (prop) {
-        return isClone ? prop.clone : prop.value;
-      }
-    }
-    return undefined;
-  }
-
-  dispatch({path, value}) {
-    this.store.dispatch({type: '', value: {path, value}});
-  }
-}
-
-class StoreAction {
-  constructor() {
-    this.items = {};
-  }
-
-  load(actions) {
-    Object.assign(this.items, actions);
-    return actions;
-  }
-
-  dispatch({type, value}) {
-    return this.item[type](value);
-  }
-}
-  */

@@ -6,22 +6,59 @@
 </head>
 <body>
 
+<script src="../footprint.js"></script>
 <script src="../node_modules/redux/dist/redux.js"></script>
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
 <script>
 
-  const counter = (state = 0, action) => {
+  const counter = (state = new CarbonValue(0), action) => {
     switch (action.type) {
-      case 'ADD':
-        return (state || 0) + action.value;
+      case 'COUNTER-ADD':
+        console.log(state.value,  action.value);
+        state.value = state.value +  action.value;
+        return state;
       default:
-        return state
+        return state;
     }
   };
 
+  const todos = (state = new CarbonValue([]), action) => {
+    let list = state.clone;
+    switch (action.type) {
+      case 'TODOS-ADD':
+        if(!Array.isArray(list)) {list = [];}
+        list.push({task: action.value, status: 'in-progress'});
+        state.value = list;
+        return state;
+      case 'TODOS-COMPLETE':
+        list[action.value].status = 'completed';
+        state.value = list;
+        return state;
+      case 'TODOS-REMOVE':
+        list.splice(action.value, 1);
+        state.value = list;
+        return state;
+      default:
+        return state;
+    }
+  };
 
-  const store = Redux.createStore(Redux.combineReducers({counter}));
+  const profile = (state = new CarbonValue(), action) => {
+    switch (action.type) {
+      case 'PROFILE-UPDATE':
+        state.value = action.value;
+        return state;
+      case 'PROFILE-UPDATENAME':
+        state.value = {path: 'name', value: action.value};
+        return state;
+      default:
+        return state;
+    }
+  };
+
+  const store = Redux.createStore(Redux.combineReducers({counter, todos, profile}));
 
   window.ReduxMixin = PolymerRedux(store);
 
@@ -29,18 +66,72 @@
     counter: {
       add: (value) => {
         store.dispatch({
-          type: 'ADD',
+          type: 'COUNTER-ADD',
           value
         })
       },
-    }
+    },
+    todos: {
+      add: (value) => {
+        store.dispatch({
+          type: 'TODOS-ADD',
+          value
+        });
+      },
+      complete: (value) => {
+        store.dispatch({
+          type: 'TODOS-COMPLETE',
+          value
+        });
+      },
+      remove: (value) => {
+        store.dispatch({
+          type: 'TODOS-REMOVE',
+          value
+        });
+      }
+    },
+    profile: {
+      update: (value) => {
+        store.dispatch({
+          type: 'PROFILE-UPDATE',
+          value
+        });
+      },
+      updateName: (value) => {
+        store.dispatch({
+          type: 'PROFILE-UPDATENAME',
+          value
+        });
+      }
+    },
   };
 </script>
 <dom-module id="app-demo">
   <template>
+    <style>
+      .clickable {
+        cursor: pointer;
+      }
+    </style>
     <h1>Counter [[counter]]</h1>
     <button on-click="addCounter" data-count="1">Add</button>
     <button on-click="addCounter" data-count="-1">Minus</button>
+    <h1>To Dos</h1>
+    <input value="{{todoTask::input}}" />
+    <button on-click="addService">Add Service</button>
+    <template is="dom-repeat" items="[[todos]]">
+      <p>[[convertZeroToOneIndex(index)]]. [[item.task]] [[item.status]] :
+        <span class="clickable" on-click="completeTask" data-idx="[[index]]">[✔]</span>
+        <span class="clickable" on-click="removeTask" data-idx="[[index]]">[X]</span>
+      </p>
+    </template>
+    <h1>Profile [[profile.id]] | [[profile.name]]</h1>
+    [[profileName]]<br/>
+    <button on-click="updateProfile" data-count="1">Update</button>
+    <button on-click="updateProfileName" data-count="1">Update Name</button>
+
+
   </template>
   <script>
     class AppDemo extends ReduxMixin(Polymer.Element) {
@@ -53,40 +144,63 @@
 
       static get properties() {
         return {
+          todoTask: String,
           storeChange:{
             type: Object,
             statePath: (value) => {console.log('storeChange',value);}
           },
+          todos: {
+            type: Array,
+            statePath: 'todos.value'
+          },
           counter: {
             type: String,
-            statePath: 'counter'
+            statePath: 'counter.value'
+          },
+          profile: {
+            type: Object,
+            statePath: 'profile.value'
+          },
+          profileName: {
+            type: Object,
+            statePath: 'profile.value.name'
           },
         };
       }
       static get observers(){
-        return [
-          'onCounterChanged(counter)',
-          'onTodosChanged(todos)',
-          'onStoreChanged(services)',
-        ];
+        return [];
       }
+
       onCounterChanged(counter) {
         console.log('onCounterChanged', counter);
       }
       addCounter(e) {
         const seed = e.currentTarget.dataset.count;
-        console.log(seed);
-        //storeAction.items.counter.add(Number(seed));
         window.actions.counter.add(Number(seed));
       }
-      onStoreChanged(data) {
-        return;
-        console.log('onStoreChanged--',data);
-        if(!this.tempServices) {
-          this.tempServices= Object.assign([], [...data]);
-        } else {
-          this.splice('tempServices', 0, this.tempServices.length, ...data);
+      addService(e) {
+        if(this.todoTask) {
+          window.actions.todos.add(this.todoTask);
+          this.todoTask = '';
         }
+      }
+      completeTask(e) {
+        window.actions.todos.complete(e.model.index);
+      }
+      removeTask(e) {
+        window.actions.todos.remove(e.model.index);
+      }
+
+      convertZeroToOneIndex(index) {
+        return index + 1;
+      }
+      updateProfile(e) {
+        this.seed += 1;
+        window.actions.profile.update({id: this.seed, name: 'seth ' + (new Date().toTimeString())});
+      }
+
+      updateProfileName(e) {
+        window.actions.profile.updateName('new name ' + (new Date().toTimeString()));
       }
     }
 
