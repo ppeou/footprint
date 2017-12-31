@@ -8,18 +8,18 @@
 <body>
 <script>
 
-  var a = new CarbonValue();
+  var a = new Footprint();
   a.value = 1;
   a.value = 2;
   console.log(a.items, a.value);
 
 
-  var b = new CarbonValue();
+  var b = new Footprint();
   b.value = {id: 1, name: 'abc'};
   b.value = {id: 1, name: 'abc-def'};
   console.log(b.items, b.value);
 
-  var c = new CarbonValue();
+  var c = new Footprint();
   c.value = {states: {tx: {cities: {1: 'Houston', 2: 'Austin'}}}};
   c.value = {path: 'states.tx.cities.2', value: 'Austin-123'}
   c.value = {path: 'states.tx.cities', value: {3: 'Dallas', 4:'San Antonio'}};

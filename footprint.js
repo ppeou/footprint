@@ -13,7 +13,7 @@ const clone = (a) => {
   }
 }
 
-class CarbonValue {
+class Footprint {
   constructor(initialValue) {
     this.items = [];
     if(initialValue !== undefined) {this.items.push(initialValue);}

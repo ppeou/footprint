@@ -13,7 +13,7 @@
 <link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
 <script>
 
-  const counter = (state = new CarbonValue(0), action) => {
+  const counter = (state = new Footprint(0), action) => {
     switch (action.type) {
       case 'COUNTER-ADD':
         console.log(state.value,  action.value);
@@ -24,7 +24,7 @@
     }
   };
 
-  const todos = (state = new CarbonValue([]), action) => {
+  const todos = (state = new Footprint([]), action) => {
     let list = state.clone;
     switch (action.type) {
       case 'TODOS-ADD':
@@ -45,7 +45,7 @@
     }
   };
 
-  const profile = (state = new CarbonValue(), action) => {
+  const profile = (state = new Footprint(), action) => {
     switch (action.type) {
       case 'PROFILE-UPDATE':
         state.value = action.value;
